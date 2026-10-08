@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from api.models import (
     Interest, Goal, AvatarCharacter, AvatarCategory, AvatarItem,
-    Subject, SubjectGradeAvailability, Topic, TopicJourneyMeta, TopicTier,
+    Curriculum, Subject, SubjectGradeAvailability, Topic, TopicJourneyMeta, TopicTier,
     Mission, Test, TestQuestion, Challenge, ChallengeOpponent, CompanionActivity
 )
 
@@ -58,29 +58,57 @@ class Command(BaseCommand):
             defaults={"name": "Explorer Compass", "description": "Never get lost on your journey.", "thumbnail_url": "https://assets.kidsverse.app/items/compass.png", "is_default": True}
         )
 
-        # 4. Subjects
-        subj_maths, _ = Subject.objects.update_or_create(slug="maths", defaults={"name": "Maths", "icon_asset": "calculator", "order_index": 1})
-        subj_lit, _ = Subject.objects.update_or_create(slug="literacy", defaults={"name": "Literacy", "icon_asset": "book-open", "order_index": 2})
-        subj_comp, _ = Subject.objects.update_or_create(slug="computer", defaults={"name": "Computer", "icon_asset": "cpu", "order_index": 3})
+        # 4. Curriculum & Subjects
+        curriculum_cbse_4, _ = Curriculum.objects.get_or_create(
+            board="CBSE", grade="Grade 4",
+            defaults={"name": "CBSE - Grade 4", "code": "cbse-grade-4", "is_active": True}
+        )
 
-        SubjectGradeAvailability.objects.update_or_create(subject=subj_maths, grade="4", defaults={"is_unlocked_default": True})
-        SubjectGradeAvailability.objects.update_or_create(subject=subj_lit, grade="4", defaults={"is_unlocked_default": True})
-        SubjectGradeAvailability.objects.update_or_create(subject=subj_comp, grade="4", defaults={"is_unlocked_default": False})
+        subj_maths, _ = Subject.objects.update_or_create(slug="maths", defaults={"name": "Maths", "icon_asset": "calculator", "order_index": 1, "curriculum": curriculum_cbse_4})
+        subj_lit, _ = Subject.objects.update_or_create(slug="literacy", defaults={"name": "Literacy", "icon_asset": "book-open", "order_index": 2, "curriculum": curriculum_cbse_4})
+        subj_comp, _ = Subject.objects.update_or_create(slug="computer", defaults={"name": "Computer", "icon_asset": "cpu", "order_index": 3, "curriculum": curriculum_cbse_4})
+
+        for s in [subj_maths, subj_lit, subj_comp]:
+            s.curricula.add(curriculum_cbse_4)
+
+        SubjectGradeAvailability.objects.update_or_create(subject=subj_maths, grade="Grade 4", defaults={"is_unlocked_default": True})
+        SubjectGradeAvailability.objects.update_or_create(subject=subj_lit, grade="Grade 4", defaults={"is_unlocked_default": True})
+        SubjectGradeAvailability.objects.update_or_create(subject=subj_comp, grade="Grade 4", defaults={"is_unlocked_default": False})
 
         # 5. Topics
         topic_frac, _ = Topic.objects.update_or_create(
-            subject=subj_maths, grade_level="4", slug="fractions",
-            defaults={"name": "Fractions", "description": "Understand parts of a whole, equivalent fractions, compare and order...", "order_index": 1}
+            subject=subj_maths, grade_level="Grade 4", slug="fractions",
+            defaults={
+                "curriculum": curriculum_cbse_4,
+                "board": "CBSE",
+                "name": "Fractions",
+                "description": "Understand parts of a whole, equivalent fractions, compare and order...",
+                "order_index": 1
+            }
         )
+        if not topic_frac.curriculum:
+            topic_frac.curriculum = curriculum_cbse_4
+            topic_frac.save(update_fields=['curriculum'])
+
         TopicJourneyMeta.objects.update_or_create(
             topic=topic_frac,
             defaults={"world_name": "Numbers Nebula", "tagline": "Master parts of a whole", "map_x": 12.5, "map_y": 30.0}
         )
 
         topic_lit, _ = Topic.objects.update_or_create(
-            subject=subj_lit, grade_level="4", slug="alphabet-bay",
-            defaults={"name": "Alphabet Bay", "description": "Letters and sounds", "order_index": 1}
+            subject=subj_lit, grade_level="Grade 4", slug="alphabet-bay",
+            defaults={
+                "curriculum": curriculum_cbse_4,
+                "board": "CBSE",
+                "name": "Alphabet Bay",
+                "description": "Letters and sounds",
+                "order_index": 1
+            }
         )
+        if not topic_lit.curriculum:
+            topic_lit.curriculum = curriculum_cbse_4
+            topic_lit.save(update_fields=['curriculum'])
+
         TopicJourneyMeta.objects.update_or_create(
             topic=topic_lit,
             defaults={"world_name": "Alphabet Bay", "tagline": "Letters and sounds", "map_x": 12.5, "map_y": 30.0}

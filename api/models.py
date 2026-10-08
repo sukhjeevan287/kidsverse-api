@@ -1,11 +1,13 @@
 import uuid
 from django.db import models
+from django.utils import timezone
 
 class Parent(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=255, unique=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
     password_hash = models.TextField()
+    pin_hash = models.TextField(null=True, blank=True)
     full_name = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -32,6 +34,7 @@ class Student(models.Model):
     name = models.CharField(max_length=255)
     grade = models.CharField(max_length=20, null=True, blank=True)
     board = models.CharField(max_length=50, null=True, blank=True)
+    curriculum = models.ForeignKey('Curriculum', on_delete=models.SET_NULL, null=True, blank=True, related_name='students')
     onboarding_completed_at = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -108,10 +111,76 @@ class OnboardingStep(models.Model):
         unique_together = ('student', 'step_key')
 
 
-class Subject(models.Model):
+class PasswordResetRequest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    parent = models.ForeignKey(Parent, on_delete=models.CASCADE, related_name='password_reset_requests')
+    requested_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'password_reset_requests'
+
+
+class ParentVerificationChallenge(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    parent = models.ForeignKey(Parent, on_delete=models.CASCADE, related_name='verification_challenges')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='parent_verification_challenges')
+    full_name = models.CharField(max_length=255)
+    relationship = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20)
+    code_hash = models.TextField()
+    expires_at = models.DateTimeField()
+    verified_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'parent_verification_challenges'
+
+
+class Curriculum(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=150)
+    code = models.CharField(max_length=100, unique=True)
+    board = models.CharField(max_length=50)
+    grade = models.CharField(max_length=20)
+    description = models.TextField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'curriculums'
+        unique_together = ('board', 'grade')
+
+    def __str__(self):
+        return f"{self.name} ({self.board} - {self.grade})"
+
+
+class Theme(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, unique=True)
     slug = models.CharField(max_length=100, unique=True)
+    description = models.TextField(null=True, blank=True)
+    icon_asset = models.CharField(max_length=100, null=True, blank=True)
+    order_index = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'themes'
+
+    def __str__(self):
+        return self.name
+
+
+class Subject(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    curriculum = models.ForeignKey(Curriculum, on_delete=models.CASCADE, null=True, blank=True, related_name='subjects')
+    curricula = models.ManyToManyField(Curriculum, related_name='curriculum_subjects', blank=True)
+    name = models.CharField(max_length=100)
+    slug = models.CharField(max_length=100)
     icon_asset = models.CharField(max_length=100, null=True, blank=True)
     order_index = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -154,7 +223,9 @@ class StudentSubjectUnlock(models.Model):
 
 class Topic(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    curriculum = models.ForeignKey(Curriculum, on_delete=models.CASCADE, null=True, blank=True, related_name='topics')
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='topics')
+    board = models.CharField(max_length=50, default='CBSE')
     name = models.CharField(max_length=150)
     slug = models.CharField(max_length=150)
     grade_level = models.CharField(max_length=20)
@@ -163,10 +234,195 @@ class Topic(models.Model):
 
     class Meta:
         db_table = 'topics'
-        unique_together = ('subject', 'grade_level', 'slug')
+        unique_together = ('subject', 'board', 'grade_level', 'slug')
 
     def __str__(self):
-        return f"{self.name} ({self.grade_level})"
+        return f"{self.name} ({self.board} - {self.grade_level})"
+
+
+class Concept(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='concepts')
+    name = models.CharField(max_length=150)
+    slug = models.CharField(max_length=150)
+    learning_objective = models.TextField(null=True, blank=True)
+    themes = models.ManyToManyField(Theme, through='ConceptPackage', related_name='concepts', blank=True)
+    order_index = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'concepts'
+        unique_together = ('topic', 'slug')
+
+    def __str__(self):
+        return f"{self.topic.name} -> {self.name}"
+
+
+class ConceptPackage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    concept = models.ForeignKey(Concept, on_delete=models.CASCADE, related_name='packages')
+    theme = models.ForeignKey(Theme, on_delete=models.CASCADE, related_name='packages')
+    content_type = models.CharField(max_length=50, default='concept_package')
+    teaching_method = models.TextField(null=True, blank=True)
+    explanation = models.TextField(null=True, blank=True)
+    image_url = models.TextField(null=True, blank=True)
+    image_prompt = models.TextField(null=True, blank=True)
+    hints = models.JSONField(default=list, blank=True)
+    nova_script = models.TextField(null=True, blank=True)
+    nova_feedback = models.TextField(null=True, blank=True)
+    learn_before_test = models.JSONField(default=dict, blank=True)
+    check_for_understanding = models.JSONField(default=list, blank=True)
+    raw_payload = models.JSONField(null=True, blank=True)
+    is_published = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'concept_packages'
+        unique_together = ('concept', 'theme')
+
+    def __str__(self):
+        return f"{self.concept.name} ({self.theme.name})"
+
+
+class LearningContent(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    package = models.OneToOneField(ConceptPackage, on_delete=models.CASCADE, related_name='learning_content')
+    concept = models.ForeignKey(Concept, on_delete=models.CASCADE, null=True, blank=True, related_name='learning_contents')
+    theme = models.ForeignKey(Theme, on_delete=models.SET_NULL, null=True, blank=True, related_name='learning_contents')
+    teaching_method = models.TextField(null=True, blank=True)
+    explanation = models.TextField(null=True, blank=True)
+    image_url = models.TextField(null=True, blank=True)
+    image_prompt = models.TextField(null=True, blank=True)
+    hints = models.JSONField(default=list, blank=True)
+    nova_script = models.TextField(null=True, blank=True)
+    nova_feedback = models.TextField(null=True, blank=True)
+    learn_before_test = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'learning_contents'
+
+    def __str__(self):
+        return f"LearningContent: {self.package}"
+
+
+class LearnBeforeTestStep(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    package = models.ForeignKey(ConceptPackage, on_delete=models.CASCADE, related_name='learn_steps')
+    learning_content = models.ForeignKey(LearningContent, on_delete=models.CASCADE, null=True, blank=True, related_name='learn_steps')
+    concept = models.ForeignKey(Concept, on_delete=models.CASCADE, null=True, blank=True, related_name='learn_steps')
+    step_key = models.CharField(max_length=50)  # 'understand', 'example', 'remember'
+    title = models.CharField(max_length=255)
+    teaching_text = models.TextField(null=True, blank=True)
+    key_idea = models.TextField(null=True, blank=True)
+    image_url = models.TextField(null=True, blank=True)
+    image_prompt = models.TextField(null=True, blank=True)
+    nova_script = models.TextField(null=True, blank=True)
+    mini_question = models.JSONField(default=dict, blank=True)  # {question, options, answer, explanation}
+    order_index = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'learn_before_test_steps'
+        ordering = ['order_index']
+
+    def __str__(self):
+        return f"[{self.step_key.upper()}] {self.title}"
+
+
+class CheckForUnderstandingQuestion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    package = models.ForeignKey(ConceptPackage, on_delete=models.CASCADE, related_name='cfu_questions')
+    learning_content = models.ForeignKey(LearningContent, on_delete=models.CASCADE, null=True, blank=True, related_name='cfu_questions')
+    question_text = models.TextField()
+    options = models.JSONField(default=list, blank=True)
+    correct_answer = models.CharField(max_length=255, null=True, blank=True)
+    difficulty = models.CharField(max_length=20, default='Easy')
+    explanation = models.TextField(null=True, blank=True)
+    order_index = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'check_for_understanding_questions'
+
+    def __str__(self):
+        return f"[CFU] {self.question_text[:50]}"
+
+
+class ConceptTestQuestion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    package = models.ForeignKey(ConceptPackage, on_delete=models.CASCADE, related_name='test_questions')
+    concept = models.ForeignKey(Concept, on_delete=models.CASCADE, null=True, blank=True, related_name='test_questions')
+    topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, null=True, blank=True, related_name='concept_test_questions')
+    question_text = models.TextField()
+    options = models.JSONField(default=list, blank=True)
+    correct_answer = models.CharField(max_length=255, null=True, blank=True)
+    difficulty = models.CharField(max_length=20, default='Medium')
+    marks = models.IntegerField(default=1)
+    explanation = models.TextField(null=True, blank=True)
+    order_index = models.IntegerField(default=0)
+    is_one_time = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'concept_test_questions'
+
+    def __str__(self):
+        return f"[TEST] {self.question_text[:50]}"
+
+
+class BattleQuestion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    package = models.ForeignKey(ConceptPackage, on_delete=models.CASCADE, related_name='battle_questions')
+    concept = models.ForeignKey(Concept, on_delete=models.CASCADE, null=True, blank=True, related_name='battle_questions')
+    topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, null=True, blank=True, related_name='battle_questions')
+    question_text = models.TextField()
+    options = models.JSONField(default=list, blank=True)
+    correct_answer = models.CharField(max_length=255, null=True, blank=True)
+    difficulty = models.CharField(max_length=20, default='Hard')
+    xp = models.IntegerField(default=20)
+    explanation = models.TextField(null=True, blank=True)
+    order_index = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'battle_questions'
+
+    def __str__(self):
+        return f"[BATTLE] {self.question_text[:50]}"
+
+
+class ConceptQuestion(models.Model):
+    QUESTION_TYPES = [
+        ('cfu', 'Check for Understanding'),
+        ('test', 'Test Question'),
+        ('battle', 'Battle Question'),
+        ('challenge', 'Challenge Question'),
+    ]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    package = models.ForeignKey(ConceptPackage, on_delete=models.CASCADE, related_name='questions')
+    question_type = models.CharField(max_length=20, choices=QUESTION_TYPES)
+    question_text = models.TextField()
+    options = models.JSONField(default=list, blank=True)
+    correct_answer = models.CharField(max_length=255, null=True, blank=True)
+    difficulty = models.CharField(max_length=20, default='Medium')
+    marks_or_xp = models.IntegerField(default=1)
+    explanation = models.TextField(null=True, blank=True)
+    nova_feedback = models.TextField(null=True, blank=True)
+    order_index = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'concept_questions'
+
+    def __str__(self):
+        return f"[{self.question_type.upper()}] {self.question_text[:50]}"
 
 
 class TopicJourneyMeta(models.Model):
@@ -253,6 +509,7 @@ class Mission(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='missions')
     tier = models.ForeignKey(TopicTier, on_delete=models.CASCADE, related_name='missions')
+    concept = models.ForeignKey(Concept, on_delete=models.SET_NULL, null=True, blank=True, related_name='missions')
     name = models.CharField(max_length=150)
     slug = models.CharField(max_length=150)
     order_index = models.IntegerField(default=0)
@@ -366,16 +623,44 @@ class ExtraLearningRecommendation(models.Model):
 
 class Challenge(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, null=True, blank=True)
+    topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, null=True, blank=True, related_name='challenges')
+    package = models.ForeignKey(ConceptPackage, on_delete=models.SET_NULL, null=True, blank=True, related_name='challenges')
+    concept = models.ForeignKey(Concept, on_delete=models.SET_NULL, null=True, blank=True, related_name='challenges')
     name = models.CharField(max_length=150)
     slug = models.CharField(max_length=150, unique=True)
     description = models.TextField(null=True, blank=True)
+    is_one_time = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'challenges'
 
     def __str__(self):
         return self.name
+
+
+class ChallengeQuestion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=True, blank=True, related_name='questions')
+    package = models.ForeignKey(ConceptPackage, on_delete=models.CASCADE, related_name='challenge_questions')
+    concept = models.ForeignKey(Concept, on_delete=models.CASCADE, null=True, blank=True, related_name='challenge_questions')
+    question_text = models.TextField()
+    options = models.JSONField(default=list, blank=True)
+    correct_answer = models.CharField(max_length=255, null=True, blank=True)
+    difficulty = models.CharField(max_length=20, default='Hard')
+    xp = models.IntegerField(default=35)
+    explanation = models.TextField(null=True, blank=True)
+    nova_feedback = models.TextField(null=True, blank=True)
+    order_index = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'challenge_questions'
+
+    def __str__(self):
+        return f"[CHALLENGE] {self.question_text[:50]}"
 
 
 class ChallengeOpponent(models.Model):
@@ -558,6 +843,25 @@ class StudentStat(models.Model):
 
     class Meta:
         db_table = 'student_stats'
+
+
+class StudentSettings(models.Model):
+    student = models.OneToOneField(Student, on_delete=models.CASCADE, primary_key=True, related_name='settings')
+    values = models.JSONField(default=dict, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'student_settings'
+
+
+class StudentBreakPass(models.Model):
+    student = models.OneToOneField(Student, on_delete=models.CASCADE, primary_key=True, related_name='break_passes')
+    available_count = models.PositiveIntegerField(default=3)
+    used_count = models.PositiveIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'student_break_passes'
 
 
 class MissionRecommendation(models.Model):
