@@ -418,3 +418,231 @@ class KidsverseAPITestCase(TestCase):
         # Create new theme
         create_theme_res = self.client.post('/api/v1/themes', {"name": "Robots"}, format='json')
         self.assertEqual(create_theme_res.status_code, 201)
+
+    def test_curriculum_content_feed_with_rich_business_requirement_payload(self):
+        # Test ingesting payload strictly following the new business requirement:
+        # - No theme_interest provided (defaults gracefully)
+        # - No test_questions provided (omitted in new curriculum structure)
+        # - learn_before_test contains explanation_ways and image_alt
+        # - check_for_understanding questions contain hints, xp, marks, novaFeedback, image_url, image_alt, etc.
+        # - battle_questions contain hints, marks, xp, novaFeedback, image_url, image_alt, etc.
+        # - challenge questions contain hints, marks, xp, novaFeedback, image_url, image_alt, etc.
+        payload = {
+            "curriculum": {
+                "grade": "Grade 1",
+                "board": "CBSE",
+                "subject": "Computer",
+                "topic": "Introduction to Computers"
+            },
+            "concept": {
+                "name": "What is a Computer?",
+                "learning_objective": "Identify the Spacebar, Enter key, and Backspace key on a keyboard and use them to add a space, start a new line, and remove a typing mistake."
+            },
+            "content_type": "concept_package",
+            "learning_content": {
+                "teaching_method": "Use a keyboard and a simple text editor with an adult. First find each key by its position and label.",
+                "image_url": "https://pub-45a9c30d5bff41a4b8ca5ff448376bf9.r2.dev/content/2026-10-18/94899feb-b732-4001-9f6c-76a6827321d8.jpg",
+                "image_prompt": "A simple child-friendly illustration of a keyboard viewed from above",
+                "image_alt": "Keyboard illustration viewed from above",
+                "explanation": "The Spacebar is the long key near the bottom of the keyboard.",
+                "hints": [
+                    "To leave a gap between two words, press the long Spacebar once.",
+                    "In a simple text editor, press Enter to begin a new line.",
+                    "If the cursor is just after an unwanted letter, press Backspace once to remove it."
+                ],
+                "nova_script": "Let us meet three helpful keys!",
+                "nova_feedback": "After each key press, look at what changed. Use that change to check your choice."
+            },
+            "learn_before_test": {
+                "required": True,
+                "order": ["understand", "example", "remember"],
+                "starts_quiz_after": "remember",
+                "steps": [
+                    {
+                        "step_key": "understand",
+                        "title": "Meet the Three Helpful Keys",
+                        "teaching_text": "Find the long Spacebar near the bottom of your keyboard.",
+                        "key_idea": "Each special key has a different job.",
+                        "image_url": "https://pub-45a9c30d5bff41a4b8ca5ff448376bf9.r2.dev/content/2026-10-18/ab019f15-3799-4353-a958-038848acd61d.jpg",
+                        "image_prompt": "A simple illustration of an adult helping a child point at a blank-key keyboard",
+                        "image_alt": "Adult helping child with keyboard",
+                        "nova_script": "Point to the long Spacebar.",
+                        "mini_question": {
+                            "question": "Which key is usually the long key near the bottom of a keyboard?",
+                            "options": ["Spacebar", "Enter", "Backspace"],
+                            "answer": "Spacebar",
+                            "explanation": "The Spacebar is usually the long horizontal key near the bottom."
+                        }
+                    },
+                    {
+                        "step_key": "example",
+                        "title": "Type About a Pet",
+                        "teaching_text": "In a simple text editor, type 'My', press Spacebar once, and type 'cat'.",
+                        "key_idea": "Use Spacebar between words, Enter for a new line, and Backspace to remove an extra letter.",
+                        "image_url": "https://pub-45a9c30d5bff41a4b8ca5ff448376bf9.r2.dev/content/2026-10-18/ad4c0362-3240-423a-a5a6-18e2a2491d59.jpg",
+                        "image_prompt": "A simple illustration of a kitten sitting beside a child using a laptop",
+                        "image_alt": "Child typing pet name",
+                        "nova_script": "Say the actions as you practise: make a gap, start a new line, remove the extra letter.",
+                        "mini_question": {
+                            "question": "You typed 'dogg' with the cursor after the last g. Which key removes only that extra final g?",
+                            "options": ["Enter", "Backspace", "Spacebar"],
+                            "answer": "Backspace",
+                            "explanation": "Backspace removes the letter just before the cursor."
+                        },
+                        "explanation_ways": [
+                            {
+                                "label": "Fruit Basket Practice",
+                                "teaching_text": "In a simple text editor, type 'red', press Spacebar once, and type 'apple'.",
+                                "key_idea": "The same three keys help you separate words.",
+                                "nova_script": "Describe your fruit!",
+                                "image_url": "https://pub-45a9c30d5bff41a4b8ca5ff448376bf9.r2.dev/content/2026-10-18/a59599da-1cfd-4810-9784-78a63fed85fb.jpg",
+                                "image_alt": "Fruit basket illustration",
+                                "image_prompt": "A simple illustration of a woven basket holding an apple",
+                                "mini_question": {
+                                    "question": "What should you press next?",
+                                    "options": ["Spacebar once", "Enter once", "Backspace once"],
+                                    "answer": "Spacebar once",
+                                    "explanation": "Spacebar adds the gap needed before the next word."
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "step_key": "remember",
+                        "title": "Remember Each Job",
+                        "teaching_text": "Say: 'Spacebar for a gap, Enter for a new line, Backspace for the character behind.'",
+                        "key_idea": "Choose a key by the change you want to make.",
+                        "image_url": "https://pub-45a9c30d5bff41a4b8ca5ff448376bf9.r2.dev/content/2026-10-18/fc8fd2ba-a9b1-4c0d-b613-df14bdeb4870.jpg",
+                        "image_prompt": "A simple close-up illustration of a child's thumb resting on spacebar",
+                        "image_alt": "Thumb on spacebar",
+                        "nova_script": "Before pressing a key, tell me its job.",
+                        "mini_question": {
+                            "question": "In our simple text editor, which key begins a new line?",
+                            "options": ["Backspace", "Spacebar", "Enter"],
+                            "answer": "Enter",
+                            "explanation": "Enter begins a new line in a simple text editor."
+                        }
+                    }
+                ]
+            },
+            "check_for_understanding": [
+                {
+                    "question": "What does pressing Spacebar once add while you are typing in a simple text editor?",
+                    "options": ["A new line", "A picture", "A space", "A spoken sound"],
+                    "answer": "A space",
+                    "difficulty": "Easy",
+                    "explanation": "Spacebar adds a space at the cursor.",
+                    "hints": ["Think about separating two words.", "The words need a small gap."],
+                    "xp": 10,
+                    "marks": 1,
+                    "novaFeedback": "Check the job: Spacebar adds a space.",
+                    "image_prompt": "A simple illustration of a blank-key keyboard with yellow spacebar",
+                    "nova_script": "Imagine typing two words. What does the Spacebar put between them?",
+                    "image_url": "https://pub-45a9c30d5bff41a4b8ca5ff448376bf9.r2.dev/content/2026-10-18/734f51c3-d10d-4d68-8572-fee84cc56731.jpg",
+                    "image_alt": "Keyboard with yellow spacebar"
+                }
+            ],
+            "battle_questions": [
+                {
+                    "question": "You typed 'big' and want to add 'tree' as the next word on the same line. Which action comes first?",
+                    "options": ["Press Enter", "Press Spacebar", "Press Backspace", "Type tree with no gap"],
+                    "answer": "Press Spacebar",
+                    "difficulty": "Easy",
+                    "explanation": "Press Spacebar before typing 'tree' to separate the two words.",
+                    "hints": ["Keep both words on the same line.", "The words need a gap."],
+                    "xp": 15,
+                    "marks": 1,
+                    "novaFeedback": "Spacebar makes room between big and tree.",
+                    "image_prompt": "A simple illustration of a large leafy tree",
+                    "nova_script": "Choose the key that separates the words.",
+                    "image_url": "https://pub-45a9c30d5bff41a4b8ca5ff448376bf9.r2.dev/content/2026-10-18/8ea3ab85-0607-4a1a-be33-5310a0ce4ea8.jpg",
+                    "image_alt": "Tree on a grassy mound"
+                }
+            ],
+            "challenge": {
+                "one_time": False,
+                "questions": [
+                    {
+                        "question": "In a simple text editor, type 'red', press Spacebar, and type 'buss'. Press Backspace once, Enter, and 'go'. Result?",
+                        "options": [
+                            "First line: red buss. Second line: go.",
+                            "One line: red bus go.",
+                            "First line: red bus. Second line: go.",
+                            "First line: redbus. Second line: go."
+                        ],
+                        "answer": "First line: red bus. Second line: go.",
+                        "difficulty": "Hard",
+                        "explanation": "Spacebar separates red and bus. Backspace fixes buss. Enter makes new line.",
+                        "hints": ["Spacebar leaves a gap after red.", "Backspace changes buss to bus."],
+                        "xp": 30,
+                        "marks": 3,
+                        "novaFeedback": "Check all three changes: red bus has a space, bus has one s, go is next line.",
+                        "image_prompt": "A simple illustration of a plain red bus parked on a quiet road",
+                        "nova_script": "Take one action at a time.",
+                        "image_url": "https://pub-45a9c30d5bff41a4b8ca5ff448376bf9.r2.dev/content/2026-10-18/bbd291af-9130-48f7-bb8b-b7b7fec44690.jpg",
+                        "image_alt": "Red bus on quiet road"
+                    }
+                ]
+            }
+        }
+
+        feed_res = self.client.post('/api/v1/admin/content/feed', payload, format='json')
+        self.assertEqual(feed_res.status_code, 201)
+        data = feed_res.data['data']
+        package_id = data['package_id']
+
+        # Verify segregated database models have rich fields stored
+        cfu_obj = CheckForUnderstandingQuestion.objects.filter(package_id=package_id).first()
+        self.assertIsNotNone(cfu_obj)
+        self.assertEqual(cfu_obj.xp, 10)
+        self.assertEqual(cfu_obj.marks, 1)
+        self.assertEqual(cfu_obj.nova_feedback, "Check the job: Spacebar adds a space.")
+        self.assertEqual(len(cfu_obj.hints), 2)
+        self.assertEqual(cfu_obj.image_alt, "Keyboard with yellow spacebar")
+
+        battle_obj = BattleQuestion.objects.filter(package_id=package_id).first()
+        self.assertIsNotNone(battle_obj)
+        self.assertEqual(battle_obj.xp, 15)
+        self.assertEqual(battle_obj.marks, 1)
+        self.assertEqual(battle_obj.nova_feedback, "Spacebar makes room between big and tree.")
+        self.assertEqual(len(battle_obj.hints), 2)
+        self.assertEqual(battle_obj.image_alt, "Tree on a grassy mound")
+
+        challenge_obj = ChallengeQuestion.objects.filter(package_id=package_id).first()
+        self.assertIsNotNone(challenge_obj)
+        self.assertEqual(challenge_obj.xp, 30)
+        self.assertEqual(challenge_obj.marks, 3)
+        self.assertEqual(challenge_obj.nova_feedback, "Check all three changes: red bus has a space, bus has one s, go is next line.")
+        self.assertEqual(len(challenge_obj.hints), 2)
+        self.assertEqual(challenge_obj.image_alt, "Red bus on quiet road")
+
+        # Verify learn_before_test step has explanation_ways
+        example_step = LearnBeforeTestStep.objects.filter(package_id=package_id, step_key='example').first()
+        self.assertIsNotNone(example_step)
+        self.assertEqual(len(example_step.explanation_ways), 1)
+        self.assertEqual(example_step.explanation_ways[0]['label'], "Fruit Basket Practice")
+        self.assertEqual(example_step.image_alt, "Child typing pet name")
+
+        # Verify detail GET reconstructs all rich fields
+        get_res = self.client.get(f'/api/v1/admin/content/packages/{package_id}')
+        self.assertEqual(get_res.status_code, 200)
+        pkg_data = get_res.data
+        self.assertEqual(pkg_data['concept']['name'], "What is a Computer?")
+        self.assertEqual(len(pkg_data['check_for_understanding']), 1)
+        self.assertEqual(pkg_data['check_for_understanding'][0]['novaFeedback'], "Check the job: Spacebar adds a space.")
+        self.assertEqual(pkg_data['check_for_understanding'][0]['marks'], 1)
+        self.assertEqual(pkg_data['check_for_understanding'][0]['xp'], 10)
+        self.assertEqual(pkg_data['check_for_understanding'][0]['image_alt'], "Keyboard with yellow spacebar")
+
+        self.assertEqual(pkg_data['battle_questions'][0]['novaFeedback'], "Spacebar makes room between big and tree.")
+        self.assertEqual(pkg_data['battle_questions'][0]['marks'], 1)
+        self.assertEqual(pkg_data['battle_questions'][0]['xp'], 15)
+
+        self.assertEqual(pkg_data['challenge']['questions'][0]['marks'], 3)
+        self.assertEqual(pkg_data['challenge']['questions'][0]['xp'], 30)
+
+        # Verify step explanation_ways reconstructed
+        example_step_data = pkg_data['learn_before_test']['steps'][1]
+        self.assertEqual(example_step_data['step_key'], 'example')
+        self.assertEqual(len(example_step_data['explanation_ways']), 1)
+        self.assertEqual(example_step_data['explanation_ways'][0]['label'], "Fruit Basket Practice")

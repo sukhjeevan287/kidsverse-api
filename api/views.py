@@ -1533,7 +1533,7 @@ class AdminContentFeedView(APIView):
         )
 
         # 5. Theme
-        theme_name = payload.get('theme_interest', 'Everyday Life')
+        theme_name = payload.get('theme_interest') or payload.get('theme') or 'Everyday Life'
         theme_slug = slugify(theme_name)
         theme_obj, _ = Theme.objects.get_or_create(
             slug=theme_slug,
@@ -1544,6 +1544,7 @@ class AdminContentFeedView(APIView):
         content_type = payload.get('content_type', 'concept_package')
         learning_content = payload.get('learning_content', {})
         cfu_data = payload.get('check_for_understanding', [])
+        image_alt = learning_content.get('image_alt') or learning_content.get('imageAlt') or ''
 
         # Parse and normalize learn_before_test (Learn Before Test · 3 Steps: Understand -> Example -> Remember)
         learn_before_test_data = payload.get('learn_before_test') or payload.get('learn_before_steps', {})
@@ -1573,9 +1574,10 @@ class AdminContentFeedView(APIView):
                 'explanation': learning_content.get('explanation', ''),
                 'image_url': learning_content.get('image_url', ''),
                 'image_prompt': learning_content.get('image_prompt', ''),
+                'image_alt': image_alt,
                 'hints': learning_content.get('hints', []),
                 'nova_script': learning_content.get('nova_script', ''),
-                'nova_feedback': learning_content.get('nova_feedback', ''),
+                'nova_feedback': learning_content.get('nova_feedback') or learning_content.get('novaFeedback') or '',
                 'learn_before_test': learn_before_test_obj,
                 'check_for_understanding': cfu_data,
                 'raw_payload': payload,
@@ -1593,9 +1595,10 @@ class AdminContentFeedView(APIView):
                 'explanation': learning_content.get('explanation', ''),
                 'image_url': learning_content.get('image_url', ''),
                 'image_prompt': learning_content.get('image_prompt', ''),
+                'image_alt': image_alt,
                 'hints': learning_content.get('hints', []),
                 'nova_script': learning_content.get('nova_script', ''),
-                'nova_feedback': learning_content.get('nova_feedback', ''),
+                'nova_feedback': learning_content.get('nova_feedback') or learning_content.get('novaFeedback') or '',
                 'learn_before_test': learn_before_test_obj,
             }
         )
@@ -1608,9 +1611,11 @@ class AdminContentFeedView(APIView):
             title = s.get('title', '')
             teaching_text = s.get('teaching_text') or s.get('teachingText', '')
             key_idea = s.get('key_idea') or s.get('keyIdea', '')
-            image_url = s.get('image_url') or s.get('imageUrl', '')
-            image_prompt = s.get('image_prompt') or s.get('imagePrompt', '')
+            step_image_url = s.get('image_url') or s.get('imageUrl', '')
+            step_image_prompt = s.get('image_prompt') or s.get('imagePrompt', '')
+            step_image_alt = s.get('image_alt') or s.get('imageAlt', '')
             nova_script = s.get('nova_script') or s.get('novaScript', '')
+            explanation_ways = s.get('explanation_ways') or s.get('explanationWays') or []
 
             mini_q = s.get('mini_question') or s.get('miniQuestion') or {}
             if not isinstance(mini_q, dict):
@@ -1630,16 +1635,32 @@ class AdminContentFeedView(APIView):
                 title=title,
                 teaching_text=teaching_text,
                 key_idea=key_idea,
-                image_url=image_url,
-                image_prompt=image_prompt,
+                image_url=step_image_url,
+                image_prompt=step_image_prompt,
+                image_alt=step_image_alt,
                 nova_script=nova_script,
                 mini_question=mini_question,
+                explanation_ways=explanation_ways,
                 order_index=idx
             )
 
         # 9. Segregated CheckForUnderstandingQuestion Table
         package.cfu_questions.all().delete()
         for idx, q in enumerate(cfu_data, 1):
+            try:
+                cfu_xp = int(q.get('xp', 10))
+            except (ValueError, TypeError):
+                cfu_xp = 10
+            try:
+                cfu_marks = int(q.get('marks', 1))
+            except (ValueError, TypeError):
+                cfu_marks = 1
+            cfu_nova_feedback = q.get('nova_feedback') or q.get('novaFeedback') or ''
+            cfu_img_prompt = q.get('image_prompt') or q.get('imagePrompt') or ''
+            cfu_nova_script = q.get('nova_script') or q.get('novaScript') or ''
+            cfu_img_url = q.get('image_url') or q.get('imageUrl') or ''
+            cfu_img_alt = q.get('image_alt') or q.get('imageAlt') or ''
+
             CheckForUnderstandingQuestion.objects.create(
                 package=package,
                 learning_content=learning_obj,
@@ -1648,10 +1669,18 @@ class AdminContentFeedView(APIView):
                 correct_answer=q.get('answer', ''),
                 difficulty=q.get('difficulty', 'Easy'),
                 explanation=q.get('explanation', ''),
+                hints=q.get('hints', []),
+                xp=cfu_xp,
+                marks=cfu_marks,
+                nova_feedback=cfu_nova_feedback,
+                image_prompt=cfu_img_prompt,
+                nova_script=cfu_nova_script,
+                image_url=cfu_img_url,
+                image_alt=cfu_img_alt,
                 order_index=idx
             )
 
-        # 9. Segregated ConceptTestQuestion Table
+        # 10. Segregated ConceptTestQuestion Table
         test_questions_data = payload.get('test_questions', {})
         test_is_one_time = False
         if isinstance(test_questions_data, dict):
@@ -1662,11 +1691,20 @@ class AdminContentFeedView(APIView):
 
         package.test_questions.all().delete()
         for idx, q in enumerate(test_q_list, 1):
-            marks = q.get('marks')
             try:
-                marks = int(marks) if marks is not None else 1
+                marks = int(q.get('marks', 1))
             except (ValueError, TypeError):
                 marks = 1
+            try:
+                t_xp = int(q.get('xp', 20))
+            except (ValueError, TypeError):
+                t_xp = 20
+            t_nova_fb = q.get('nova_feedback') or q.get('novaFeedback') or ''
+            t_img_prompt = q.get('image_prompt') or q.get('imagePrompt') or ''
+            t_nova_script = q.get('nova_script') or q.get('novaScript') or ''
+            t_img_url = q.get('image_url') or q.get('imageUrl') or ''
+            t_img_alt = q.get('image_alt') or q.get('imageAlt') or ''
+
             ConceptTestQuestion.objects.create(
                 package=package,
                 concept=concept,
@@ -1676,12 +1714,19 @@ class AdminContentFeedView(APIView):
                 correct_answer=q.get('answer', ''),
                 difficulty=q.get('difficulty', 'Medium'),
                 marks=marks,
+                xp=t_xp,
                 explanation=q.get('explanation', ''),
+                hints=q.get('hints', []),
+                nova_feedback=t_nova_fb,
+                image_prompt=t_img_prompt,
+                nova_script=t_nova_script,
+                image_url=t_img_url,
+                image_alt=t_img_alt,
                 is_one_time=test_is_one_time,
                 order_index=idx
             )
 
-        # Synchronize with Test & TestQuestion for student testing flow
+        # Synchronize with Test & TestQuestion for student testing flow (if test questions provided)
         topic_test, _ = Test.objects.get_or_create(
             topic=topic,
             slug=f"{concept.slug}-test",
@@ -1691,9 +1736,8 @@ class AdminContentFeedView(APIView):
             }
         )
         for idx, q in enumerate(test_q_list, 1):
-            marks = q.get('marks', 1)
             try:
-                marks = int(marks) if marks is not None else 1
+                marks = int(q.get('marks', 1))
             except (ValueError, TypeError):
                 marks = 1
             TestQuestion.objects.update_or_create(
@@ -1708,15 +1752,24 @@ class AdminContentFeedView(APIView):
                 }
             )
 
-        # 10. Segregated BattleQuestion Table
+        # 11. Segregated BattleQuestion Table
         battle_q_list = payload.get('battle_questions', [])
         package.battle_questions.all().delete()
         for idx, q in enumerate(battle_q_list, 1):
-            xp = q.get('xp')
             try:
-                xp = int(xp) if xp is not None else 20
+                xp = int(q.get('xp', 20))
             except (ValueError, TypeError):
                 xp = 20
+            try:
+                b_marks = int(q.get('marks', 1))
+            except (ValueError, TypeError):
+                b_marks = 1
+            b_nova_fb = q.get('nova_feedback') or q.get('novaFeedback') or ''
+            b_img_prompt = q.get('image_prompt') or q.get('imagePrompt') or ''
+            b_nova_script = q.get('nova_script') or q.get('novaScript') or ''
+            b_img_url = q.get('image_url') or q.get('imageUrl') or ''
+            b_img_alt = q.get('image_alt') or q.get('imageAlt') or ''
+
             BattleQuestion.objects.create(
                 package=package,
                 concept=concept,
@@ -1726,11 +1779,18 @@ class AdminContentFeedView(APIView):
                 correct_answer=q.get('answer', ''),
                 difficulty=q.get('difficulty', 'Hard'),
                 xp=xp,
+                marks=b_marks,
                 explanation=q.get('explanation', ''),
+                hints=q.get('hints', []),
+                nova_feedback=b_nova_fb,
+                image_prompt=b_img_prompt,
+                nova_script=b_nova_script,
+                image_url=b_img_url,
+                image_alt=b_img_alt,
                 order_index=idx
             )
 
-        # 11. Segregated Challenge & ChallengeQuestion Table
+        # 12. Segregated Challenge & ChallengeQuestion Table
         challenge_data = payload.get('challenge', {})
         challenge_is_one_time = False
         if isinstance(challenge_data, dict):
@@ -1754,11 +1814,20 @@ class AdminContentFeedView(APIView):
 
         package.challenge_questions.all().delete()
         for idx, q in enumerate(challenge_q_list, 1):
-            xp = q.get('xp')
             try:
-                xp = int(xp) if xp is not None else 35
+                xp = int(q.get('xp', 35))
             except (ValueError, TypeError):
                 xp = 35
+            try:
+                c_marks = int(q.get('marks', 1))
+            except (ValueError, TypeError):
+                c_marks = 1
+            c_nova_fb = q.get('nova_feedback') or q.get('novaFeedback') or ''
+            c_img_prompt = q.get('image_prompt') or q.get('imagePrompt') or ''
+            c_nova_script = q.get('nova_script') or q.get('novaScript') or ''
+            c_img_url = q.get('image_url') or q.get('imageUrl') or ''
+            c_img_alt = q.get('image_alt') or q.get('imageAlt') or ''
+
             ChallengeQuestion.objects.create(
                 challenge=challenge_obj,
                 package=package,
@@ -1768,14 +1837,24 @@ class AdminContentFeedView(APIView):
                 correct_answer=q.get('answer', ''),
                 difficulty=q.get('difficulty', 'Hard'),
                 xp=xp,
+                marks=c_marks,
                 explanation=q.get('explanation', ''),
-                nova_feedback=q.get('nova_feedback', ''),
+                hints=q.get('hints', []),
+                nova_feedback=c_nova_fb,
+                image_prompt=c_img_prompt,
+                nova_script=c_nova_script,
+                image_url=c_img_url,
+                image_alt=c_img_alt,
                 order_index=idx
             )
 
-        # 12. Populate legacy ConceptQuestion for backward compatibility
+        # 13. Populate legacy ConceptQuestion for backward compatibility
         package.questions.all().delete()
         for idx, q in enumerate(cfu_data, 1):
+            try:
+                cfu_marks = int(q.get('marks', 1))
+            except (ValueError, TypeError):
+                cfu_marks = 1
             ConceptQuestion.objects.create(
                 package=package,
                 question_type='cfu',
@@ -1783,13 +1862,19 @@ class AdminContentFeedView(APIView):
                 options=q.get('options', []),
                 correct_answer=q.get('answer', ''),
                 difficulty=q.get('difficulty', 'Easy'),
+                marks_or_xp=cfu_marks,
                 explanation=q.get('explanation', ''),
+                hints=q.get('hints', []),
+                nova_feedback=q.get('nova_feedback') or q.get('novaFeedback') or '',
+                image_prompt=q.get('image_prompt') or q.get('imagePrompt') or '',
+                nova_script=q.get('nova_script') or q.get('novaScript') or '',
+                image_url=q.get('image_url') or q.get('imageUrl') or '',
+                image_alt=q.get('image_alt') or q.get('imageAlt') or '',
                 order_index=idx
             )
         for idx, q in enumerate(test_q_list, 1):
-            marks = q.get('marks')
             try:
-                marks = int(marks) if marks is not None else 1
+                marks = int(q.get('marks', 1))
             except (ValueError, TypeError):
                 marks = 1
             ConceptQuestion.objects.create(
@@ -1801,12 +1886,17 @@ class AdminContentFeedView(APIView):
                 difficulty=q.get('difficulty', 'Medium'),
                 marks_or_xp=marks,
                 explanation=q.get('explanation', ''),
+                hints=q.get('hints', []),
+                nova_feedback=q.get('nova_feedback') or q.get('novaFeedback') or '',
+                image_prompt=q.get('image_prompt') or q.get('imagePrompt') or '',
+                nova_script=q.get('nova_script') or q.get('novaScript') or '',
+                image_url=q.get('image_url') or q.get('imageUrl') or '',
+                image_alt=q.get('image_alt') or q.get('imageAlt') or '',
                 order_index=idx
             )
         for idx, q in enumerate(battle_q_list, 1):
-            xp = q.get('xp')
             try:
-                xp = int(xp) if xp is not None else 20
+                xp = int(q.get('xp', 20))
             except (ValueError, TypeError):
                 xp = 20
             ConceptQuestion.objects.create(
@@ -1818,12 +1908,17 @@ class AdminContentFeedView(APIView):
                 difficulty=q.get('difficulty', 'Hard'),
                 marks_or_xp=xp,
                 explanation=q.get('explanation', ''),
+                hints=q.get('hints', []),
+                nova_feedback=q.get('nova_feedback') or q.get('novaFeedback') or '',
+                image_prompt=q.get('image_prompt') or q.get('imagePrompt') or '',
+                nova_script=q.get('nova_script') or q.get('novaScript') or '',
+                image_url=q.get('image_url') or q.get('imageUrl') or '',
+                image_alt=q.get('image_alt') or q.get('imageAlt') or '',
                 order_index=idx
             )
         for idx, q in enumerate(challenge_q_list, 1):
-            xp = q.get('xp')
             try:
-                xp = int(xp) if xp is not None else 35
+                xp = int(q.get('xp', 35))
             except (ValueError, TypeError):
                 xp = 35
             ConceptQuestion.objects.create(
@@ -1835,11 +1930,16 @@ class AdminContentFeedView(APIView):
                 difficulty=q.get('difficulty', 'Hard'),
                 marks_or_xp=xp,
                 explanation=q.get('explanation', ''),
-                nova_feedback=q.get('nova_feedback', ''),
+                hints=q.get('hints', []),
+                nova_feedback=q.get('nova_feedback') or q.get('novaFeedback') or '',
+                image_prompt=q.get('image_prompt') or q.get('imagePrompt') or '',
+                nova_script=q.get('nova_script') or q.get('novaScript') or '',
+                image_url=q.get('image_url') or q.get('imageUrl') or '',
+                image_alt=q.get('image_alt') or q.get('imageAlt') or '',
                 order_index=idx
             )
 
-        # 13. Synchronize Mission so student learning path immediately reflects this concept
+        # 14. Synchronize Mission so student learning path immediately reflects this concept
         tier, _ = TopicTier.objects.get_or_create(
             topic=topic,
             tier_key='school_syllabus',
@@ -1963,7 +2063,16 @@ class AdminContentPackageDetailView(APIView):
                 "options": q.options,
                 "answer": q.correct_answer,
                 "difficulty": q.difficulty,
-                "explanation": q.explanation
+                "explanation": q.explanation,
+                "hints": q.hints,
+                "xp": q.xp,
+                "marks": q.marks,
+                "nova_feedback": q.nova_feedback or '',
+                "novaFeedback": q.nova_feedback or '',
+                "image_prompt": q.image_prompt or '',
+                "nova_script": q.nova_script or '',
+                "image_url": q.image_url or '',
+                "image_alt": q.image_alt or '',
             }
             for q in package.cfu_questions.all().order_by('order_index')
         ]
@@ -1974,7 +2083,16 @@ class AdminContentPackageDetailView(APIView):
                     "options": q.options,
                     "answer": q.correct_answer,
                     "difficulty": q.difficulty,
-                    "explanation": q.explanation
+                    "explanation": q.explanation,
+                    "hints": q.hints,
+                    "xp": q.marks_or_xp,
+                    "marks": q.marks_or_xp,
+                    "nova_feedback": q.nova_feedback or '',
+                    "novaFeedback": q.nova_feedback or '',
+                    "image_prompt": q.image_prompt or '',
+                    "nova_script": q.nova_script or '',
+                    "image_url": q.image_url or '',
+                    "image_alt": q.image_alt or '',
                 }
                 for q in package.questions.filter(question_type='cfu').order_by('order_index')
             ]
@@ -1986,7 +2104,15 @@ class AdminContentPackageDetailView(APIView):
                 "answer": q.correct_answer,
                 "difficulty": q.difficulty,
                 "marks": q.marks,
-                "explanation": q.explanation
+                "xp": q.xp,
+                "explanation": q.explanation,
+                "hints": q.hints,
+                "nova_feedback": q.nova_feedback or '',
+                "novaFeedback": q.nova_feedback or '',
+                "image_prompt": q.image_prompt or '',
+                "nova_script": q.nova_script or '',
+                "image_url": q.image_url or '',
+                "image_alt": q.image_alt or '',
             }
             for q in package.test_questions.all().order_by('order_index')
         ]
@@ -1998,7 +2124,15 @@ class AdminContentPackageDetailView(APIView):
                     "answer": q.correct_answer,
                     "difficulty": q.difficulty,
                     "marks": q.marks_or_xp,
-                    "explanation": q.explanation
+                    "xp": q.marks_or_xp,
+                    "explanation": q.explanation,
+                    "hints": q.hints,
+                    "nova_feedback": q.nova_feedback or '',
+                    "novaFeedback": q.nova_feedback or '',
+                    "image_prompt": q.image_prompt or '',
+                    "nova_script": q.nova_script or '',
+                    "image_url": q.image_url or '',
+                    "image_alt": q.image_alt or '',
                 }
                 for q in package.questions.filter(question_type='test').order_by('order_index')
             ]
@@ -2010,7 +2144,15 @@ class AdminContentPackageDetailView(APIView):
                 "answer": q.correct_answer,
                 "difficulty": q.difficulty,
                 "xp": q.xp,
-                "explanation": q.explanation
+                "marks": q.marks,
+                "explanation": q.explanation,
+                "hints": q.hints,
+                "nova_feedback": q.nova_feedback or '',
+                "novaFeedback": q.nova_feedback or '',
+                "image_prompt": q.image_prompt or '',
+                "nova_script": q.nova_script or '',
+                "image_url": q.image_url or '',
+                "image_alt": q.image_alt or '',
             }
             for q in package.battle_questions.all().order_by('order_index')
         ]
@@ -2022,7 +2164,15 @@ class AdminContentPackageDetailView(APIView):
                     "answer": q.correct_answer,
                     "difficulty": q.difficulty,
                     "xp": q.marks_or_xp,
-                    "explanation": q.explanation
+                    "marks": 1,
+                    "explanation": q.explanation,
+                    "hints": q.hints,
+                    "nova_feedback": q.nova_feedback or '',
+                    "novaFeedback": q.nova_feedback or '',
+                    "image_prompt": q.image_prompt or '',
+                    "nova_script": q.nova_script or '',
+                    "image_url": q.image_url or '',
+                    "image_alt": q.image_alt or '',
                 }
                 for q in package.questions.filter(question_type='battle').order_by('order_index')
             ]
@@ -2034,8 +2184,15 @@ class AdminContentPackageDetailView(APIView):
                 "answer": q.correct_answer,
                 "difficulty": q.difficulty,
                 "xp": q.xp,
+                "marks": q.marks,
                 "explanation": q.explanation,
-                "nova_feedback": q.nova_feedback
+                "hints": q.hints,
+                "nova_feedback": q.nova_feedback or '',
+                "novaFeedback": q.nova_feedback or '',
+                "image_prompt": q.image_prompt or '',
+                "nova_script": q.nova_script or '',
+                "image_url": q.image_url or '',
+                "image_alt": q.image_alt or '',
             }
             for q in package.challenge_questions.all().order_by('order_index')
         ]
@@ -2047,8 +2204,15 @@ class AdminContentPackageDetailView(APIView):
                     "answer": q.correct_answer,
                     "difficulty": q.difficulty,
                     "xp": q.marks_or_xp,
+                    "marks": 1,
                     "explanation": q.explanation,
-                    "nova_feedback": q.nova_feedback
+                    "hints": q.hints,
+                    "nova_feedback": q.nova_feedback or '',
+                    "novaFeedback": q.nova_feedback or '',
+                    "image_prompt": q.image_prompt or '',
+                    "nova_script": q.nova_script or '',
+                    "image_url": q.image_url or '',
+                    "image_alt": q.image_alt or '',
                 }
                 for q in package.questions.filter(question_type='challenge').order_by('order_index')
             ]
@@ -2056,6 +2220,7 @@ class AdminContentPackageDetailView(APIView):
         teaching_method = learning_content_obj.teaching_method if learning_content_obj else package.teaching_method
         image_url = learning_content_obj.image_url if learning_content_obj else package.image_url
         image_prompt = learning_content_obj.image_prompt if learning_content_obj else package.image_prompt
+        image_alt = (learning_content_obj.image_alt if learning_content_obj else package.image_alt) or ''
         explanation = learning_content_obj.explanation if learning_content_obj else package.explanation
         hints = learning_content_obj.hints if learning_content_obj else package.hints
         nova_script = learning_content_obj.nova_script if learning_content_obj else package.nova_script
@@ -2072,13 +2237,15 @@ class AdminContentPackageDetailView(APIView):
                     "key_idea": s.key_idea or '',
                     "image_url": s.image_url or '',
                     "image_prompt": s.image_prompt or '',
+                    "image_alt": s.image_alt or '',
                     "nova_script": s.nova_script or '',
                     "mini_question": s.mini_question or {
                         "question": "",
                         "options": [],
                         "answer": "",
                         "explanation": ""
-                    }
+                    },
+                    "explanation_ways": s.explanation_ways or []
                 }
                 for s in learn_steps_qs
             ]
@@ -2119,6 +2286,7 @@ class AdminContentPackageDetailView(APIView):
                 "teaching_method": teaching_method,
                 "image_url": image_url,
                 "image_prompt": image_prompt,
+                "image_alt": image_alt,
                 "explanation": explanation,
                 "hints": hints,
                 "nova_script": nova_script,

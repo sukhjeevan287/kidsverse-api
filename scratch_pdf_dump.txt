@@ -1,0 +1,1604 @@
+=== PAGE 1 ===
+Kidsverse All Screens API Documentation  
+Screen details, required fields, and sample API request and response for each screen. 
+Screen 01  Landing 
+ 
+SCREEN DETAILS 
+Screen Name  Landing 
+Screen No  01 
+Screen URL  / 
+Login / Auth  No 
+API URL  No API call 
+HTTP Method  None 
+API REQUIRED FIELDS 
+Field Required 
+No need of API No 
+REQUEST 
+Method: None 
+API URL: No need of API 
+Request Body:  
+No need of API 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 2 ===
+Screen 02  Parent Login 
+ 
+SCREEN DETAILS 
+Screen Name  Parent Login 
+Screen No  02 
+Screen URL  /parent/login 
+Login / Auth  No 
+API URL  /api/v1/auth/parent/login 
+HTTP Method  POST 
+API REQUIRED FIELDS
+Field Required
+email Yes
+password Yes
+REQUEST
+Method: POST
+API URL: /api/v1/auth/parent/login
+Request Body:
+Not captured
+RESPONSE
+{
+  "parent": {
+    "id": "3496c53a-1b3d-4410-9d8d-e437d7f768eb",
+    "email": "vanshdhiman22@gmail.com",
+    "full_name": "",
+    "phone": "",
+    "created_at": "2026-09-20T07:36:27.559028Z",
+    "last_login_at": "2026-09-24T17:32:27.867952Z"
+  }
+}
+Request sent Yes
+Response received Yes
+
+=== PAGE 3 ===
+Screen 03  Forgot Password
+SCREEN DETAILS
+Screen Name Forgot Password
+Screen No 03
+Screen URL /parent/forgot-password
+Login / Auth No
+API URL /api/v1/auth/parent/forgot-password (proposed)
+HTTP Method POST
+API REQUIRED FIELDS
+Field Required
+email Yes
+REQUEST
+Method: POST
+API URL: /api/v1/auth/parent/forgot-password
+Request Body:
+RESPONSE
+Response: No response
+Response received No
+Request sent No
+Not captured
+
+=== PAGE 4 ===
+Screen 04  Create Account 
+ 
+SCREEN DETAILS 
+Screen Name  Create Account 
+Screen No  04 
+Screen URL  /parent/create-account 
+Login / Auth  No 
+API REQUIRED FIELDS
+Field Required
+email Yes
+password Yes
+confirmPassword Yes
+agreedToTerms Yes
+REQUEST
+Method: POST
+API URL: /api/v1/auth/parent/signup
+Request Body:
+Not captured
+RESPONSE
+{
+  "parent": {
+    "id": "5ec1a392-dabb-4970-a06e-4c9b18ff3588",
+    "email": "vanshdhiman1112@gmail.com",
+    "full_name": "",
+    "phone": "",
+    "created_at": "2026-09-24T05:59:49.827902Z",
+    "last_login_at": null
+  }
+}
+HTTP Method POST
+API URL /api/v1/auth/parent/signup
+Request sent Yes
+Response received Yes
+
+=== PAGE 5 ===
+Screen 05  Create Child 
+ 
+SCREEN DETAILS 
+Screen Name  Create Child 
+Screen No  05 
+Screen URL  /onboarding/child 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+name Yes
+REQUEST
+Method: POST
+API URL: /api/v1/students
+Request Body:
+{
+  "name": "Vansh"
+}
+RESPONSE
+{
+  "id": "a2fce745-8346-41e3-adcb-15d0a7096ac8",
+  "parent_id": "5ec1a392-dabb-4970-a06e-4c9b18ff3588",
+  "name": "Vansh",
+  "onboarding_completed_at": null,
+  "created_at": "2026-09-24T06:03:38.224146+00:00"
+}
+HTTP Method POST
+API URL /api/v1/students
+Request sent Yes
+Response received Yes
+
+=== PAGE 6 ===
+Screen 06  Parent Verification 
+ 
+SCREEN DETAILS 
+Screen Name  Parent Verification 
+Screen No  06 
+Screen URL  /onboarding/parent-details 
+Login / Auth  Yes 
+API URL  /api/v1/parent/verification/start 
+HTTP Method  POST 
+API REQUIRED FIELDS 
+Field Required 
+full_name Yes 
+relationship Yes 
+phone Yes 
+student_id Yes 
+REQUEST 
+Method: POST 
+API URL: /api/v1/parent/verification/start 
+Request Body:  
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+Not captured
+
+=== PAGE 7 ===
+Screen 07  Parent OTP Entry 
+ 
+SCREEN DETAILS 
+Screen Name  Parent OTP Entry 
+Screen No  07 
+Screen URL  /onboarding/parent-details 
+Login / Auth  Yes 
+API URL  /api/v1/parent/verification/verify 
+HTTP Method  POST 
+API REQUIRED FIELDS 
+Field Required 
+challenge_id Yes 
+code Yes 
+REQUEST 
+Method: POST 
+API URL: /api/v1/parent/verification/verify 
+Request Body:  
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+Not captured
+
+=== PAGE 8 ===
+Screen 08  Learning Setup 
+ 
+SCREEN DETAILS 
+Screen Name  Learning Setup 
+Screen No  08 
+Screen URL  /onboarding/grade-board 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+grade Yes
+board Yes
+REQUEST
+Method: PATCH
+API URL: /api/v1/students/{student_id}/grade-board
+Request Body:
+{
+  "grade": "playschool",
+  "board": "CBSE"
+}
+RESPONSE
+{
+  "id": "a9c242e7-df7b-4c7f-ba1f-6f45422b6c1d",
+  "parent_id": "a4ca9c68-613a-4901-9102-abb300717827",
+  "name": "vansh",
+  "grade": "playschool",
+  "board": "CBSE",
+  "avatar": null,
+  "onboarding_completed_at": null,
+  "created_at": "2026-09-24T06:07:44.008045Z"
+}
+HTTP Method PATCH
+API URL /api/v1/students/{student_id}/grade-board
+Request sent Yes
+Response received Yes
+
+=== PAGE 9 ===
+Screen 09  Avatar 
+ 
+SCREEN DETAILS 
+Screen Name  Avatar 
+Screen No  09 
+Screen URL  /onboarding/avatar 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+character_id Yes
+outfit_item_id Yes
+hair_item_id No
+accessory_item_id No
+REQUEST
+Method: PUT
+API URL: /api/v1/students/{student_id}/avatar
+Request Body:
+{
+  "character_id": "4b722a62-82e2-421a-8750-23a5f3aea1f2",
+  "outfit_item_id": "859273dc-9212-40ae-a221-68ffc80eae9c",
+  "hair_item_id": null,
+  "accessory_item_id": null
+}
+RESPONSE
+{
+  "character_id": "4b722a62-82e2-421a-8750-23a5f3aea1f2",
+  "outfit_item_id": "859273dc-9212-40ae-a221-68ffc80eae9c",
+  "hair_item_id": null,
+  "accessory_item_id": null,
+  "updated_at": "2026-09-24T06:09:03.155989+00:00"
+}
+HTTP Method PUT
+API URL /api/v1/students/{student_id}/avatar
+Request sent Yes
+Response received Yes
+
+=== PAGE 10 ===
+Screen 10  Interests 
+ 
+SCREEN DETAILS 
+Screen Name  Interests 
+Screen No  10 
+Screen URL  /onboarding/interests 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+interest_ids Yes
+REQUEST
+Method: PUT
+API URL: /api/v1/students/{student_id}/interests
+Request Body:
+{
+  "interest_ids": [
+    "2ce24d65-2b97-460f-81b6-c809f16c7e75",
+    "39b34100-de4c-44c6-98ba-45e66f72d7bd",
+    "717853ea-fee6-4213-a5ce-f4e8712bad7f"
+  ]
+}
+RESPONSE
+{
+  "selected_count": 3,
+  "interest_ids": [
+    "2ce24d65-2b97-460f-81b6-c809f16c7e75",
+    "39b34100-de4c-44c6-98ba-45e66f72d7bd",
+    "717853ea-fee6-4213-a5ce-f4e8712bad7f"
+  ]
+}
+HTTP Method PUT
+API URL /api/v1/students/{student_id}/interests
+Request sent Yes
+Response received Yes
+
+=== PAGE 11 ===
+Screen 11  Goals 
+ 
+SCREEN DETAILS 
+Screen Name  Goals 
+Screen No  11 
+Screen URL  /onboarding/goals 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+goal_ids Yes
+REQUEST
+Method: PUT
+API URL: /api/v1/students/{student_id}/goals
+Request Body:
+{
+  "goal_ids": [
+    "d6c3ca24-3cea-42df-97c8-4a0c411caea2",
+    "c76d1b00-ee03-4946-84f4-97fadd7ba517",
+    "935faf27-6a5e-49a3-9b75-6d5600aab194"
+  ]
+}
+RESPONSE
+{
+  "goal_ids": [
+    "d6c3ca24-3cea-42df-97c8-4a0c411caea2",
+    "c76d1b00-ee03-4946-84f4-97fadd7ba517",
+    "935faf27-6a5e-49a3-9b75-6d5600aab194"
+  ]
+}
+HTTP Method PUT
+API URL /api/v1/students/{student_id}/goals
+Request sent Yes
+Response received Yes
+
+=== PAGE 12 ===
+Screen 12  Meet Nova 
+ 
+SCREEN DETAILS 
+Screen Name  Meet Nova 
+Screen No  12 
+Screen URL  /onboarding/nova 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+REQUEST 1
+Method: POST
+API URL: /api/v1/students/{student_id}/onboarding/steps/lobby/complete
+Request Body:
+{}
+RESPONSE 1
+{
+  "step_key": "lobby",
+  "completed_at": "2026-09-24T06:14:54.152524+00:00"
+}
+REQUEST 2
+Method: POST
+API URL: /api/v1/students/{student_id}/nova/greet
+Request Body:
+{}
+RESPONSE 2
+{
+  "message": "Hey vansh! I'm Nova, your AI learning companion!",
+  "onboarding_completed_at": "2026-09-24T06:14:56.653263+00:00"
+}
+HTTP Method POST
+API URL See REQUEST
+Request sent Yes
+Response received Yes
+
+=== PAGE 13 ===
+Screen 13  Welcome
+SCREEN DETAILS
+Screen Name Welcome
+Screen No 13
+Screen URL /welcome
+Login / Auth Yes
+API URL /api/v1/students/{student_id}/learning-path (proposed)
+HTTP Method GET
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/students/{student_id}/learning-path
+Request Body: No body (GET request)
+RESPONSE
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 14 ===
+Screen 14  Home 
+ 
+SCREEN DETAILS 
+Screen Name  Home 
+Screen No  14 
+Screen URL  /home 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/students/{student_id}/home
+Request Body:
+No body (GET request)
+RESPONSE
+{"greeting":"Ready for today's adventure, vansh?","stats":{"day_streak":0,"total_xp":0,"level":1},
+"recommended_mission":{"mission_id":"2f31f675-133b-4887-a6a5-e9ecb00fe73f","title":"What is a Fraction?",
+"subject":"Maths","topic":"Fractions","duration_minutes":8,"reason":
+"Start your journey with this mission!","xp_reward":30,"progress_percent":0},"subjects":[{"id":
+"b075f9ed-0669-4010-b7d2-080c17fbf36b","name":"Maths","slug":"maths","progress_percent":0,"locked":false,
+"badge":null},{"id":"b29492a3-1721-4975-b71e-8aed1765c874","name":"Literacy","slug":"literacy",
+"progress_percent":0,"locked":false,"badge":null},{"id":"97f8a263-c64d-4b61-8a00-e9a1d7b5bb68","name":
+"Computer","slug":"computer","progress_percent":0,"locked":false,"badge":null}]}
+HTTP Method GET
+API URL /api/v1/students/{student_id}/home
+Request sent Yes
+Response received Yes
+
+=== PAGE 15 ===
+Screen 15  Settings Panel
+SCREEN DETAILS
+Screen Name Settings Panel
+Screen No 15
+Screen URL /home
+Login / Auth Yes
+API URL /api/v1/students/{student_id}/settings (proposed)
+HTTP Method GET / PATCH
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+settings (PATCH body) Yes
+REQUEST
+Load: GET /api/v1/students/{student_id}/settings
+Save: PATCH /api/v1/students/{student_id}/settings
+Request Body: 
+RESPONSE
+Response: No response
+Response received No
+Request sent No
+Not captured
+
+=== PAGE 16 ===
+Screen 16  Nova Chat
+SCREEN DETAILS
+Screen Name Nova Chat
+Screen No 16
+Screen URL /home
+Login / Auth Yes
+API URL /api/v1/students/{student_id}/nova/messages (proposed)
+HTTP Method GET / POST
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+message (POST body) Yes
+topic_id (POST body) Yes
+REQUEST
+History: GET /api/v1/students/{student_id}/nova/messages
+Ask Nova: POST /api/v1/students/{student_id}/nova/messages
+Request Body: 
+RESPONSE
+Response: No response
+Response received No
+Request sent No
+Not captured
+
+=== PAGE 17 ===
+Screen 17  Learn Hub
+SCREEN DETAILS
+Screen Name Learn Hub
+Screen No 17
+Screen URL /learn
+Login / Auth Yes
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/students/{student_id}/subjects
+Request Body:
+No body (GET request)
+RESPONSE
+{"subjects":[{"id":"b075f9ed-0669-4010-b7d2-080c17fbf36b","subject_id":
+"b075f9ed-0669-4010-b7d2-080c17fbf36b","name":"Maths","slug":"maths","icon_asset":"calculator",
+"progress_percent":0,"locked":false,"badge":null},{"id":"b29492a3-1721-4975-b71e-8aed1765c874",
+"subject_id":"b29492a3-1721-4975-b71e-8aed1765c874","name":"Literacy","slug":"literacy","icon_asset":
+"book-open","progress_percent":0,"locked":false,"badge":null},{"id":
+"97f8a263-c64d-4b61-8a00-e9a1d7b5bb68","subject_id":"97f8a263-c64d-4b61-8a00-e9a1d7b5bb68","name":
+"Computer","slug":"computer","icon_asset":"cpu","progress_percent":0,"locked":false,"badge":null}]}
+HTTP Method GET
+API URL /api/v1/students/{student_id}/subjects
+Request sent Yes
+Response received Yes
+
+=== PAGE 18 ===
+Screen 18  Journey Map 
+ 
+SCREEN DETAILS 
+Screen Name  Journey Map 
+Screen No  18 
+Screen URL  /journey?subject=maths 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+subject (query) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/students/{student_id}/journey?subject=maths
+Request Body:
+No body (GET request)
+RESPONSE
+{
+  "subject": "Maths",
+  "tagline": "Explore Maths with Nova!",
+  "worlds": [
+    {
+      "topic_id": "0ceff38e-ad0e-4c88-83b9-d87037460c33",
+      "world_name": "Numbers Nebula",
+      "tagline": "Master parts of a whole",
+      "status": "locked",
+      "map_x": 12.5,
+      "map_y": 30.0
+    }
+  ],
+  "companion_activities": []
+}
+HTTP Method GET
+API URL /api/v1/students/{student_id}/journey?subject=maths
+Request sent Yes
+Response received Yes
+
+=== PAGE 19 ===
+Screen 19  Literacy Journey Map 
+ 
+SCREEN DETAILS 
+Screen Name  Literacy Journey Map 
+Screen No  19 
+Screen URL  /journey?subject=literacy 
+Login / Auth  Yes 
+API URL  /api/v1/students/{student_id}/journey?subject=maths 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/students/{student_id}/journey?subject=maths 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 20 ===
+Screen 20  EVS Journey Map 
+ 
+SCREEN DETAILS 
+Screen Name  EVS Journey Map 
+Screen No  20 
+Screen URL  /journey?subject=evs 
+Login / Auth  Yes 
+API URL  /api/v1/students/{student_id}/journey?subject=maths 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/students/{student_id}/journey?subject=maths 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 21 ===
+Screen 21  Topic 
+ 
+SCREEN DETAILS 
+Screen Name  Topic 
+Screen No  21 
+Screen URL  /learn/topics/maths 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+topic_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/students/{student_id}/topics/{topic_id}
+Request Body:
+No body (GET request)
+RESPONSE
+{"id":"0ceff38e-ad0e-4c88-83b9-d87037460c33","name":"Fractions","grade_level":"4","subject":"Maths",
+"description":"Understand parts of a whole, equivalent fractions, compare and order...","tiers":[{
+"tier_key":"school_syllabus","label":"School Syllabus","status":"unlocked","missions":
+["What is a Fraction?","Equivalent Fractions","Compare & Order"]},{"tier_key":"kidsverse_plus","label":
+"Kidsverse Plus","status":"locked","missions":["Mars Supply Rescue"]},{"tier_key":"competition_edge",
+"label":"Competition Edge","status":"locked","missions":[]}],"nodes":[{"mission_id":
+"2f31f675-133b-4887-a6a5-e9ecb00fe73f","order_index":1,"name":"What is a Fraction?","status":"locked",
+"stars":0},{"mission_id":"bb56aed3-2144-451f-bc9a-bdc012cf4641","order_index":2,"name":
+"Equivalent Fractions","status":"locked","stars":0},{"mission_id":"ea825d86-a480-454b-9d26-9750d4f9fae7",
+"order_index":3,"name":"Compare & Order","status":"locked","stars":0},{"mission_id":
+"8af8d1fb-26ca-44b8-8102-cc5476ff8c09","order_index":4,"name":"Mars Supply Rescue","status":"locked",
+"stars":0}]}
+HTTP Method GET
+API URL /api/v1/students/{student_id}/topics/{topic_id}
+Request sent Yes
+Response received Yes
+
+=== PAGE 22 ===
+Screen 22  Literacy Topic 
+ 
+SCREEN DETAILS 
+Screen Name  Literacy Topic 
+Screen No  22 
+Screen URL  /learn/topics/literacy 
+Login / Auth  Yes 
+API URL  /api/v1/students/{student_id}/topics/{topic_id} 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/students/{student_id}/topics/{topic_id} 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 23 ===
+Screen 23  EVS Topic 
+ 
+SCREEN DETAILS 
+Screen Name  EVS Topic 
+Screen No  23 
+Screen URL  /learn/topics/evs 
+Login / Auth  Yes 
+API URL  /api/v1/students/{student_id}/topics/{topic_id} 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/students/{student_id}/topics/{topic_id} 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 24 ===
+Screen 24  Computer Topic 
+ 
+SCREEN DETAILS 
+Screen Name  Computer Topic 
+Screen No  24 
+Screen URL  /learn/topics/computer 
+Login / Auth  Yes 
+API URL  /api/v1/students/{student_id}/topics/{topic_id} 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/students/{student_id}/topics/{topic_id} 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 25 ===
+Screen 25  General Awareness Topic 
+ 
+SCREEN DETAILS 
+Screen Name  General Awareness Topic 
+Screen No  25 
+Screen URL  /learn/topics/general 
+Login / Auth  Yes 
+API URL  /api/v1/students/{student_id}/topics/{topic_id} 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/students/{student_id}/topics/{topic_id} 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 26 ===
+Screen 26  Lesson - Discover 
+ 
+SCREEN DETAILS 
+Screen Name  Lesson - Discover 
+Screen No  26 
+Screen URL  /missions/fractions 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+mission_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/missions/{mission_id}
+Request Body:
+No body (GET request)
+RESPONSE
+{
+  "id": "2f31f675-133b-4887-a6a5-e9ecb00fe73f",
+  "topic_id": "0ceff38e-ad0e-4c88-83b9-d87037460c33",
+  "tier_key": "school_syllabus",
+  "name": "What is a Fraction?",
+  "xp_reward": 30,
+  "content": {
+    "type": "interactive_lesson",
+    "steps": [
+      "Lesson 1: Parts of a whole"
+    ]
+  }
+}
+HTTP Method GET
+API URL /api/v1/missions/{mission_id}
+Request sent Yes
+Response received Yes
+
+=== PAGE 27 ===
+Screen 27  Learning Understand 
+ 
+SCREEN DETAILS 
+Screen Name  Learning Understand 
+Screen No  27 
+Screen URL  /missions/fractions/learn?subject=maths 
+Login / Auth  Yes 
+API URL /learning-packages/{content_id}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+content_id (path) Yes
+REQUEST
+Method: GET
+API URL: /learning-packages/{content_id}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 28 ===
+Screen 28  Learning Example Way 1 
+ 
+SCREEN DETAILS 
+Screen Name  Learning Example Way 1 
+Screen No  28 
+Screen URL  /missions/fractions/learn?subject=maths 
+Login / Auth  Yes 
+API URL /learning-packages/{content_id}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+content_id (path) Yes
+REQUEST
+Method: GET
+API URL: /learning-packages/{content_id}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 29 ===
+Screen 29  Learning Example Way 2 
+ 
+SCREEN DETAILS 
+Screen Name  Learning Example Way 2 
+Screen No  29 
+Screen URL  /missions/fractions/learn?subject=maths 
+Login / Auth  Yes 
+API URL /learning-packages/{content_id}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+content_id (path) Yes
+REQUEST
+Method: GET
+API URL: /learning-packages/{content_id}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 30 ===
+Screen 30  Learning Example Way 3 
+ 
+SCREEN DETAILS 
+Screen Name  Learning Example Way 3 
+Screen No  30 
+Screen URL  /missions/fractions/learn?subject=maths 
+Login / Auth  Yes 
+API URL /learning-packages/{content_id}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+content_id (path) Yes
+REQUEST
+Method: GET
+API URL: /learning-packages/{content_id}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 31 ===
+Screen 31  Learning Remember 
+ 
+SCREEN DETAILS 
+Screen Name  Learning Remember 
+Screen No  31 
+Screen URL  /missions/fractions/learn?subject=maths 
+Login / Auth  Yes 
+API URL /learning-packages/{content_id}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+content_id (path) Yes
+REQUEST
+Method: GET
+API URL: /learning-packages/{content_id}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 32 ===
+Screen 32  Literacy Understand 
+ 
+SCREEN DETAILS 
+Screen Name  Literacy Understand 
+Screen No  32 
+Screen URL  /missions/fractions/learn?subject=maths 
+Login / Auth  Yes 
+API URL /learning-packages/{content_id}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+content_id (path) Yes
+REQUEST
+Method: GET
+API URL: /learning-packages/{content_id}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 33 ===
+Screen 33  Literacy Example 
+ 
+SCREEN DETAILS 
+Screen Name  Literacy Example 
+Screen No  33 
+Screen URL  /missions/fractions/learn?subject=maths 
+Login / Auth  Yes 
+API URL /learning-packages/{content_id}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+content_id (path) Yes
+REQUEST
+Method: GET
+API URL: /learning-packages/{content_id}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 34 ===
+Screen 34  Literacy Example Way 2 
+ 
+SCREEN DETAILS 
+Screen Name  Literacy Example Way 2 
+Screen No  34 
+Screen URL  /missions/fractions/learn?subject=maths 
+Login / Auth  Yes 
+API URL /learning-packages/{content_id}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+content_id (path) Yes
+REQUEST
+Method: GET
+API URL: /learning-packages/{content_id}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 35 ===
+Screen 35  Literacy Example Way 3 
+ 
+SCREEN DETAILS 
+Screen Name  Literacy Example Way 3 
+Screen No  35 
+Screen URL  /missions/fractions/learn?subject=maths 
+Login / Auth  Yes 
+API URL /learning-packages/{content_id}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+content_id (path) Yes
+REQUEST
+Method: GET
+API URL: /learning-packages/{content_id}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 36 ===
+Screen 36  Literacy Remember 
+ 
+SCREEN DETAILS 
+Screen Name  Literacy Remember 
+Screen No  36 
+Screen URL  /missions/fractions/learn?subject=maths 
+Login / Auth  Yes 
+API URL /learning-packages/{content_id}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+content_id (path) Yes
+REQUEST
+Method: GET
+API URL: /learning-packages/{content_id}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 37 ===
+Screen 37  Mission Check Question 
+ 
+SCREEN DETAILS 
+Screen Name  Mission Check Question 
+Screen No  37 
+Screen URL  /missions/fractions/spot-mistake?subject=maths 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+mission_id (path) Yes
+REQUEST
+Method: POST
+API URL: /api/v1/students/{student_id}/missions/{mission_id}/start
+Request Body:
+{}
+RESPONSE
+{
+  "status": "in_progress",
+  "started_at": "2026-09-24T16:39:20.430881+00:00"
+}
+HTTP Method POST
+API URL /api/v1/students/{student_id}/missions/{mission_id}/start
+Request sent Yes
+Response received Yes
+
+=== PAGE 38 ===
+Screen 38  Mission Complete 
+ 
+SCREEN DETAILS 
+Screen Name  Mission Complete 
+Screen No  38 
+Screen URL  /missions/fractions/complete?subject=maths 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/students/{student_id}/home
+Request Body:
+No body (GET request)
+RESPONSE
+{"greeting":"Ready for today's adventure, VVansh?","stats":{"day_streak":1,"total_xp":30,"level":1},
+"recommended_mission":{"mission_id":"2f31f675-133b-4887-a6a5-e9ecb00fe73f","title":"What is a Fraction?",
+"subject":"Maths","topic":"Fractions","duration_minutes":8,"reason":
+"Start your journey with this mission!","xp_reward":30,"progress_percent":0},"subjects":[{"id":
+"b075f9ed-0669-4010-b7d2-080c17fbf36b","subject_id":"b075f9ed-0669-4010-b7d2-080c17fbf36b","name":"Maths"
+,"slug":"maths","icon_asset":"calculator","progress_percent":0,"locked":false,"badge":null},{"id":
+"b29492a3-1721-4975-b71e-8aed1765c874","subject_id":"b29492a3-1721-4975-b71e-8aed1765c874","name":
+"Literacy","slug":"literacy","icon_asset":"book-open","progress_percent":0,"locked":false,"badge":null},{
+"id":"97f8a263-c64d-4b61-8a00-e9a1d7b5bb68","subject_id":"97f8a263-c64d-4b61-8a00-e9a1d7b5bb68","name":
+"Computer","slug":"computer","icon_asset":"cpu","progress_percent":0,"locked":false,"badge":null}]}
+HTTP Method GET
+API URL /api/v1/students/{student_id}/home
+Request sent Yes
+Response received Yes
+
+=== PAGE 39 ===
+Screen 39  Mission Answer Review 
+ 
+SCREEN DETAILS 
+Screen Name  Mission Answer Review 
+Screen No  39 
+Screen URL  /missions/fractions/complete?subject=maths 
+Login / Auth  Yes 
+API URL /api/v1/students/{student_id}/missions/{mission_id}/review (proposed)
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+student_id, mission_id Yes
+REQUEST
+Method: GET
+API URL: /api/v1/students/{id}/missions/{mission}/review (proposed)
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 40 ===
+Screen 40  Test Arena 
+ 
+SCREEN DETAILS 
+Screen Name  Test Arena 
+Screen No  40 
+Screen URL  /tests 
+Login / Auth  Yes 
+API URL  /api/v1/topics/{topic_id}/tests 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/topics/{topic_id}/tests 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 41 ===
+Screen 41  Test Intro 
+ 
+SCREEN DETAILS 
+Screen Name  Test Intro 
+Screen No  41 
+Screen URL  /tests/mixed/intro?subject=maths 
+Login / Auth  Yes 
+API URL /api/v1/topics/{topic_id}/tests
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+topic_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/topics/{topic_id}/tests
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 42 ===
+Screen 42  Test Question 
+ 
+SCREEN DETAILS 
+Screen Name  Test Question 
+Screen No  42 
+Screen URL  /tests/mixed/question?subject=maths 
+Login / Auth  Yes 
+API URL See REQUEST
+HTTP Method GET / POST
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+attempt_id, order; answer on submit Yes
+REQUEST
+Method: GET / POST
+GET /api/v1/tests/attempts/{attempt_id}/questions/{order}
+POST /api/v1/tests/attempts/{attempt_id}/answers
+Request Body: question_id, selected_answer (POST)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 43 ===
+Screen 43  Test Question Hint 
+ 
+SCREEN DETAILS 
+Screen Name  Test Question Hint 
+Screen No  43 
+Screen URL  /tests/mixed/question 
+Login / Auth  Yes 
+API URL /api/v1/tests/attempts/{attempt_id}/questions/{order}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+attempt_id, order Yes
+REQUEST
+Method: GET
+API URL: /api/v1/tests/attempts/{attempt_id}/questions/{order}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 44 ===
+Screen 44  Test Result 
+ 
+SCREEN DETAILS 
+Screen Name  Test Result 
+Screen No  44 
+Screen URL  /tests/mixed/result?subject=maths 
+Login / Auth  Yes 
+API URL /api/v1/tests/attempts/{attempt_id}/result
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+attempt_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/tests/attempts/{attempt_id}/result
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 45 ===
+Screen 45  Test Answer Review 
+ 
+SCREEN DETAILS 
+Screen Name  Test Answer Review 
+Screen No  45 
+Screen URL  /tests/mixed/result 
+Login / Auth  Yes 
+API URL /api/v1/tests/attempts/{attempt_id}/review (proposed)
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+attempt_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/tests/attempts/{attempt_id}/review (proposed)
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 46 ===
+Screen 46  Extra Learning 
+ 
+SCREEN DETAILS 
+Screen Name  Extra Learning 
+Screen No  46 
+Screen URL  /extra 
+Login / Auth  Yes 
+API URL /api/v1/students/{student_id}/extra-learning (proposed)
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/students/{student_id}/extra-learning (proposed)
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 47 ===
+Screen 47  Reading Fluency 
+ 
+SCREEN DETAILS 
+Screen Name  Reading Fluency 
+Screen No  47 
+Screen URL  /extra/reading 
+Login / Auth  Yes 
+API URL  /api/v1/students/{student_id}/journey?subject=maths 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/students/{student_id}/journey?subject=maths 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 48 ===
+Screen 48  Speaking Confidence Practice 
+ 
+SCREEN DETAILS 
+Screen Name  Speaking Confidence Practice 
+Screen No  48 
+Screen URL  /extra/confidence 
+Login / Auth  Yes 
+API URL  /api/v1/students/{student_id}/journey?subject=maths 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/students/{student_id}/journey?subject=maths 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 49 ===
+Screen 49  Challenge Home 
+ 
+SCREEN DETAILS 
+Screen Name  Challenge Home 
+Screen No  49 
+Screen URL  /challenge 
+Login / Auth  Yes 
+API URL /api/v1/challenges
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+authenticated student Yes
+REQUEST
+Method: GET
+API URL: /api/v1/challenges
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 50 ===
+Screen 50  Battle Opponents 
+ 
+SCREEN DETAILS 
+Screen Name  Battle Opponents 
+Screen No  50 
+Screen URL  /challenge/opponents 
+Login / Auth  Yes 
+API URL  /api/v1/challenges 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/challenges 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 51 ===
+Screen 51  Battle Preview 
+ 
+SCREEN DETAILS 
+Screen Name  Battle Preview 
+Screen No  51 
+Screen URL  /challenge/preview 
+Login / Auth  Yes 
+API URL /api/v1/challenges/{challenge_id}/preview?opponent_id={id}
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+challenge_id, opponent_id Yes
+REQUEST
+Method: GET
+API URL: /api/v1/challenges/{challenge_id}/preview?opponent_id={id}
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 52 ===
+Screen 52  Battle Arena 
+ 
+SCREEN DETAILS 
+Screen Name  Battle Arena 
+Screen No  52 
+Screen URL  /challenge/battle 
+Login / Auth  Yes 
+API URL /api/v1/students/{student_id}/challenge-battles
+HTTP Method POST
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+student_id, challenge_id, opponent_id Yes
+REQUEST
+Method: POST
+API URL: /api/v1/students/{student_id}/challenge-battles
+Request Body: Not captured
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 53 ===
+Screen 53  Battle Result 
+ 
+SCREEN DETAILS 
+Screen Name  Battle Result 
+Screen No  53 
+Screen URL  /challenge/result 
+Login / Auth  Yes 
+API URL /api/v1/challenge-battles/{battle_id}/result
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+battle_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/challenge-battles/{battle_id}/result
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 54 ===
+Screen 54  Leaderboard 
+ 
+SCREEN DETAILS 
+Screen Name  Leaderboard 
+Screen No  54 
+Screen URL  /challenge/leaderboard 
+Login / Auth  Yes 
+API URL /api/v1/challenges/{challenge_id}/leaderboard (proposed)
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+challenge_id (path) Yes
+scope (query: friends / India / global) Yes
+limit, cursor (query) No
+REQUEST
+Method: GET
+API URL: /api/v1/challenges/{challenge_id}/leaderboard?scope={scope} (proposed)
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+Response fields needed (proposed):
+scope, updated_at, total_players
+current_student: rank, xp, battles_played
+entries[]: rank, display_name, avatar_url, xp, battles_played
+
+=== PAGE 55 ===
+Screen 55  Student Profile 
+ 
+SCREEN DETAILS 
+Screen Name  Student Profile 
+Screen No  55 
+Screen URL  /profile 
+Login / Auth  Yes 
+API REQUIRED FIELDS
+Field Required
+student_id (path) Yes
+REQUEST
+Method: GET
+API URL: /api/v1/students/{student_id}/profile
+Request Body:
+No body (GET request)
+RESPONSE
+{
+  "name": "vansh",
+  "level": 1,
+  "total_xp": 0,
+  "day_streak": 0,
+  "avatar_thumbnail_url": "https://assets.kidsverse.app/avatars/explorer_boy_1.png",
+  "grade": "playschool",
+  "board": "CBSE"
+}
+HTTP Method GET
+API URL /api/v1/students/{student_id}/profile
+Request sent Yes
+Response received Yes
+
+=== PAGE 56 ===
+Screen 56  Our Journey 
+ 
+SCREEN DETAILS 
+Screen Name  Our Journey 
+Screen No  56 
+Screen URL  /profile/journey 
+Login / Auth  Yes 
+API URL  /api/v1/students/{student_id}/profile/our-journey 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/students/{student_id}/profile/our-journey 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 57 ===
+Screen 57  Break Passes 
+ 
+SCREEN DETAILS 
+Screen Name  Break Passes 
+Screen No  57 
+Screen URL  /profile/break-passes 
+Login / Auth  Yes 
+API URL /api/v1/students/{student_id}/break-passes (proposed)
+HTTP Method GET / POST
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+student_id; pass use on POST Yes
+REQUEST
+Method: GET / POST
+API URL: /api/v1/students/{student_id}/break-passes (proposed)
+Request Body: Not captured
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 58 ===
+Screen 58  Parent PIN Gate 
+ 
+SCREEN DETAILS 
+Screen Name  Parent PIN Gate 
+Screen No  58 
+Screen URL  /parent 
+Login / Auth  Yes 
+API URL /api/v1/parent/pin/verify (proposed)
+HTTP Method POST
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+parent PIN Yes
+REQUEST
+Method: POST
+API URL: /api/v1/parent/pin/verify (proposed)
+Request Body: Not captured
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 59 ===
+Screen 59  Switch Student Unlocked 
+ 
+SCREEN DETAILS 
+Screen Name  Switch Student Unlocked 
+Screen No  59 
+Screen URL  /switch 
+Login / Auth  Yes 
+API URL /api/v1/parent/students
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+parent authentication Yes
+REQUEST
+Method: GET
+API URL: /api/v1/parent/students
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 60 ===
+Screen 60  Parent Overview 
+ 
+SCREEN DETAILS 
+Screen Name  Parent Overview 
+Screen No  60 
+Screen URL  /parent 
+Login / Auth  Yes 
+API URL  /api/v1/parent/overview 
+HTTP Method  GET 
+API REQUIRED FIELDS 
+Field Required 
+No body (GET request) Yes 
+REQUEST 
+Method: GET 
+API URL: /api/v1/parent/overview 
+Request Body:  
+No request body 
+RESPONSE 
+Response: No response
+Response received No
+Request sent No
+
+=== PAGE 61 ===
+Screen 61  Parent Topic Evidence 
+ 
+SCREEN DETAILS 
+Screen Name  Parent Topic Evidence 
+Screen No  61 
+Screen URL  /parent/evidence 
+Login / Auth  Yes 
+API URL /api/v1/parent/evidence (proposed)
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+student_id, topic_id Yes
+REQUEST
+Method: GET
+API URL: /api/v1/parent/evidence (proposed)
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+
+=== PAGE 62 ===
+Screen 62  Parent Weekly Plan 
+ 
+SCREEN DETAILS 
+Screen Name  Parent Weekly Plan 
+Screen No  62 
+Screen URL  /parent/plan 
+Login / Auth  Yes 
+API URL /api/v1/parent/plan (proposed)
+HTTP Method GET
+Request sent Not captured
+Response received Not captured
+API REQUIRED FIELDS
+Field Required
+student_id, week Yes
+REQUEST
+Method: GET
+API URL: /api/v1/parent/plan (proposed)
+Request Body: No body (GET request)
+RESPONSE
+Response: No response captured
+API required: Yes
+

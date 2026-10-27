@@ -229,7 +229,8 @@ class LearnBeforeTestStepSerializer(serializers.ModelSerializer):
         model = LearnBeforeTestStep
         fields = [
             'id', 'step_key', 'title', 'teaching_text', 'key_idea',
-            'image_url', 'image_prompt', 'nova_script', 'mini_question', 'order_index'
+            'image_url', 'image_prompt', 'image_alt', 'nova_script',
+            'mini_question', 'explanation_ways', 'order_index'
         ]
 
 
@@ -240,32 +241,58 @@ class LearningContentSerializer(serializers.ModelSerializer):
         model = LearningContent
         fields = [
             'id', 'package_id', 'teaching_method', 'explanation', 'image_url',
-            'image_prompt', 'hints', 'nova_script', 'nova_feedback', 'learn_before_test', 'learn_steps'
+            'image_prompt', 'image_alt', 'hints', 'nova_script', 'nova_feedback',
+            'learn_before_test', 'learn_steps'
         ]
 
 
 class CheckForUnderstandingQuestionSerializer(serializers.ModelSerializer):
+    novaFeedback = serializers.CharField(source='nova_feedback', read_only=True)
+
     class Meta:
         model = CheckForUnderstandingQuestion
-        fields = ['id', 'question_text', 'options', 'correct_answer', 'difficulty', 'explanation', 'order_index']
+        fields = [
+            'id', 'question_text', 'options', 'correct_answer', 'difficulty',
+            'explanation', 'hints', 'xp', 'marks', 'nova_feedback', 'novaFeedback',
+            'image_prompt', 'nova_script', 'image_url', 'image_alt', 'order_index'
+        ]
 
 
 class ConceptTestQuestionSerializer(serializers.ModelSerializer):
+    novaFeedback = serializers.CharField(source='nova_feedback', read_only=True)
+
     class Meta:
         model = ConceptTestQuestion
-        fields = ['id', 'question_text', 'options', 'correct_answer', 'difficulty', 'marks', 'explanation', 'order_index', 'is_one_time']
+        fields = [
+            'id', 'question_text', 'options', 'correct_answer', 'difficulty',
+            'marks', 'xp', 'explanation', 'hints', 'nova_feedback', 'novaFeedback',
+            'image_prompt', 'nova_script', 'image_url', 'image_alt',
+            'order_index', 'is_one_time'
+        ]
 
 
 class BattleQuestionSerializer(serializers.ModelSerializer):
+    novaFeedback = serializers.CharField(source='nova_feedback', read_only=True)
+
     class Meta:
         model = BattleQuestion
-        fields = ['id', 'question_text', 'options', 'correct_answer', 'difficulty', 'xp', 'explanation', 'order_index']
+        fields = [
+            'id', 'question_text', 'options', 'correct_answer', 'difficulty',
+            'xp', 'marks', 'explanation', 'hints', 'nova_feedback', 'novaFeedback',
+            'image_prompt', 'nova_script', 'image_url', 'image_alt', 'order_index'
+        ]
 
 
 class ChallengeQuestionSerializer(serializers.ModelSerializer):
+    novaFeedback = serializers.CharField(source='nova_feedback', read_only=True)
+
     class Meta:
         model = ChallengeQuestion
-        fields = ['id', 'question_text', 'options', 'correct_answer', 'difficulty', 'xp', 'explanation', 'nova_feedback', 'order_index']
+        fields = [
+            'id', 'question_text', 'options', 'correct_answer', 'difficulty',
+            'xp', 'marks', 'explanation', 'hints', 'nova_feedback', 'novaFeedback',
+            'image_prompt', 'nova_script', 'image_url', 'image_alt', 'order_index'
+        ]
 
 
 class ConceptQuestionSerializer(serializers.ModelSerializer):
@@ -273,7 +300,8 @@ class ConceptQuestionSerializer(serializers.ModelSerializer):
         model = ConceptQuestion
         fields = [
             'id', 'question_type', 'question_text', 'options', 'correct_answer',
-            'difficulty', 'marks_or_xp', 'explanation', 'nova_feedback', 'order_index'
+            'difficulty', 'marks_or_xp', 'explanation', 'hints', 'nova_feedback',
+            'image_prompt', 'nova_script', 'image_url', 'image_alt', 'order_index'
         ]
 
 
